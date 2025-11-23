@@ -1,8 +1,5 @@
-// Buscar clima por ciudad
-document.getElementById('clima-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    const ciudad = document.getElementById('ciudad').value.trim();
+// Función para buscar por ciudad
+async function buscarClimaPorCiudad(ciudad) {
     const resultadoDiv = document.getElementById('resultado');
     const errorDiv = document.getElementById('error');
     const loadingDiv = document.getElementById('loading');
@@ -26,6 +23,7 @@ document.getElementById('clima-form').addEventListener('submit', async function(
         loadingDiv.classList.add('hidden');
         
         if (response.ok) {
+            guardarEnHistorial(ciudad);
             mostrarResultado(data);
         } else {
             mostrarError(data.error || 'Error desconocido');
@@ -34,6 +32,16 @@ document.getElementById('clima-form').addEventListener('submit', async function(
     } catch (error) {
         loadingDiv.classList.add('hidden');
         mostrarError('Error de conexión con el servidor');
+    }
+}
+
+// Buscar clima por ciudad
+document.getElementById('clima-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const ciudad = document.getElementById('ciudad').value.trim();
+    if (ciudad) {
+        await buscarClimaPorCiudad(ciudad);
     }
 });
 
@@ -77,6 +85,73 @@ async function obtenerClimaPorIP() {
         mostrarError('Error de conexión al obtener ubicación');
     }
 }
+
+// Historial de búsquedas
+function guardarEnHistorial(ciudad) {
+    let historial = JSON.parse(localStorage.getItem('historialClima')) || [];
+    
+    // Remover si ya existe (para evitar duplicados)
+    historial = historial.filter(item => item.toLowerCase() !== ciudad.toLowerCase());
+    
+    // Agregar al principio
+    historial.unshift(ciudad);
+    
+    // Mantener solo las últimas 5 búsquedas
+    historial = historial.slice(0, 5);
+    
+    // Guardar en localStorage
+    localStorage.setItem('historialClima', JSON.stringify(historial));
+    
+    // Actualizar la interfaz
+    mostrarHistorial();
+}
+
+function mostrarHistorial() {
+    const historial = JSON.parse(localStorage.getItem('historialClima')) || [];
+    const historialDiv = document.getElementById('historial');
+    const container = document.getElementById('historial-container');
+    
+    if (historial.length > 0) {
+        historialDiv.innerHTML = historial.map(ciudad => `
+            <button 
+                class="historial-btn px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all text-sm font-medium"
+                data-ciudad="${ciudad}"
+            >
+                <i class="fas fa-history mr-1 text-gray-500"></i>${ciudad}
+            </button>
+        `).join('');
+        
+        container.classList.remove('hidden');
+        
+        // Agregar event listeners a los botones del historial
+        document.querySelectorAll('.historial-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const ciudad = this.getAttribute('data-ciudad');
+                document.getElementById('ciudad').value = ciudad;
+                buscarClimaPorCiudad(ciudad);
+            });
+        });
+    } else {
+        container.classList.add('hidden');
+    }
+}
+
+function limpiarHistorial() {
+    localStorage.removeItem('historialClima');
+    mostrarHistorial();
+}
+
+// Event listener para el botón limpiar
+document.addEventListener('DOMContentLoaded', function() {
+    // Mostrar historial al cargar la página
+    mostrarHistorial();
+    
+    // Event listener para limpiar historial
+    const btnLimpiar = document.getElementById('btn-limpiar-historial');
+    if (btnLimpiar) {
+        btnLimpiar.addEventListener('click', limpiarHistorial);
+    }
+});
 
 function mostrarResultado(data) {
     const resultadoDiv = document.getElementById('resultado');

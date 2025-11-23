@@ -42,6 +42,19 @@
             <p class="text-xs text-gray-500 mt-2">(Usa tu IP para detectar la ciudad)</p>
         </div>
 
+        <!-- Historial de Búsquedas -->
+        <div id="historial-container" class="hidden mt-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="text-lg font-semibold text-gray-800">Búsquedas recientes</h3>
+                <button id="btn-limpiar-historial" class="text-sm text-red-500 hover:text-red-700 transition-colors">
+                    <i class="fas fa-trash-alt mr-1"></i>Limpiar
+                </button>
+            </div>
+            <div id="historial" class="flex flex-wrap gap-2">
+                <!-- Los botones de historial se generarán aquí -->
+            </div>
+        </div>
+
         <!-- Loading -->
         <div id="loading" class="hidden mt-6 text-center">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
