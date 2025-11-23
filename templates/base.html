@@ -5,9 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Clima App{% endblock %}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-gradient-to-br from-blue-400 to-blue-600 min-h-screen">
+<body class="bg-gradient-to-br from-blue-400 to-blue-600 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300">
+    <!-- Botón Toggle Modo Oscuro -->
+    <div class="fixed top-4 right-4 z-10">
+        <button id="btn-toggle-tema" class="p-3 bg-white/20 dark:bg-gray-800/50 backdrop-blur-sm rounded-full hover:bg-white/30 dark:hover:bg-gray-700/50 transition-all duration-300 shadow-lg">
+            <i class="fas fa-moon text-white dark:hidden"></i>
+            <i class="fas fa-sun text-yellow-300 hidden dark:block"></i>
+        </button>
+    </div>
+
     <div class="container mx-auto px-4 py-8">
         {% block content %}{% endblock %}
     </div>
