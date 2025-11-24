@@ -27,3 +27,19 @@ export async function obtenerClimaPorIP() {
     
     return data;
 }
+
+export async function obtenerPronosticoExtendido(ciudad) {
+    const response = await fetch('/pronostico', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `ciudad=${encodeURIComponent(ciudad)}`
+    });
+    
+    if (!response.ok) {
+        throw new Error('Error al obtener el pronóstico extendido');
+    }
+    
+    return await response.json();
+}
