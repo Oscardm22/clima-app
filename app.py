@@ -55,10 +55,21 @@ def obtener_clima():
 @app.route('/clima_por_ip', methods=['GET'])
 def obtener_clima_por_ip():
     try:
-        # Usar una API para obtener ubicación por IP
-        ip_response = requests.get('http://ip-api.com/json/')
+        if request.headers.get('X-Forwarded-For'):
+            # En producción (Render, etc.)
+            user_ip = request.headers.get('X-Forwarded-For').split(',')[0]
+        else:
+            # En desarrollo local
+            user_ip = request.remote_addr
+        
+        print(f"📍 IP del usuario: {user_ip}")
+        
+        # Usar la IP del usuario para geolocalización
+        ip_response = requests.get(f'http://ip-api.com/json/{user_ip}')
         ip_data = ip_response.json()
-                
+        
+        print(f"📍 Ubicación detectada: {ip_data.get('city', 'Desconocida')}")
+        
         if ip_data['status'] == 'success':
             ciudad = ip_data['city']
             
@@ -91,6 +102,7 @@ def obtener_clima_por_ip():
         return jsonify({'error': 'No se pudo determinar tu ubicación'}), 404
             
     except Exception as e:
+        print(f"💥 Error en ubicación por IP: {str(e)}")
         return jsonify({'error': 'Error del servidor'}), 500
     
 @app.route('/pronostico', methods=['POST'])
